@@ -1,0 +1,223 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: qbittorrent
+  labels:
+    name: qbittorrent
+    
+---                           
+apiVersion: v1                # qBittorrent loadbalancer          
+kind: Service
+metadata:
+  name: qbittorrent-lb
+  namespace: qbittorrent
+spec:
+  selector: 
+    app: qbittorrent
+  ports:
+    - name: 8080-tcp
+      port: 8080
+      targetPort: 8080
+    - name: 6881-tcp
+      port: 6881
+      targetPort: 6881
+    - name: 6881-udp
+      port: 6881
+      protocol: UDP
+      targetPort: 6881
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.84
+
+---                          
+apiVersion: v1                 # Radarr loadbalancer
+kind: Service
+metadata:
+  name: radarr-lb
+  namespace: qbittorrent
+spec:
+  selector: 
+    app: qbittorrent
+  ports:
+    - name: 7878-tcp
+      port: 7878
+      targetPort: 7878
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.85
+
+---                           
+apiVersion: v1                # Jackett loadbalancer
+kind: Service
+metadata:
+  name: jackett-lb
+  namespace: qbittorrent
+spec:
+  selector: 
+    app: qbittorrent
+  ports:
+    - name: 9117-jackett
+      port: 9117
+      targetPort: 9117
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.86
+
+---                           
+apiVersion: v1                # Bazarr loadbalancer
+kind: Service
+metadata:
+  name: bazarr-lb
+  namespace: qbittorrent
+spec:
+  selector: 
+    app: qbittorrent
+  ports:
+    - name: 6767-bazarr
+      port: 6767
+      targetPort: 6767
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.87
+
+---
+apiVersion: apps/v1           # Deployment
+kind: Deployment
+metadata:
+  name: qbittorrent
+  namespace: qbittorrent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qbittorrent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: qbittorrent
+    spec:
+      securityContext:
+        fsGroup: 3048
+      containers:
+        - env:                  # qBittorrent container
+            - name: PGID
+              value: "3048"
+            - name: PUID
+              value: "3048"
+            - name: TZ
+              value: Cst/UTC
+            - name: QBT_WEBUI_PORT
+              value: "8080"
+          image: qbittorrentofficial/qbittorrent-nox:latest
+          name: qbittorrent
+          ports:
+            - containerPort: 8080
+            - containerPort: 6881
+            - containerPort: 6881
+              protocol: UDP
+          resources:
+            limits:
+              cpu: "2000m"
+              memory: "2048Mi"
+            requests:
+              cpu: "500m"
+              memory: "256Mi"
+          volumeMounts:
+            - mountPath: /config
+              name: qb-config
+        - env:                      #Radarr container
+            - name: PGID
+              value: "3048"
+            - name: PUID
+              value: "3048"
+            - name: TZ
+              value: Cst/UTC
+          image: lscr.io/linuxserver/radarr:latest
+          name: radarr
+          ports:
+            - containerPort: 7878
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "2000m"
+              memory: "2048Mi"
+            requests:
+              cpu: "500m"
+              memory: "256Mi"
+          volumeMounts:
+            - mountPath: /config
+              name: radarr-config
+            - mountPath: /media
+              name: radarr-media
+        - env:                      # Jackett container
+            - name: PGID
+              value: "3048"
+            - name: PUID
+              value: "3048"
+            - name: TZ
+              value: Cst/UTC
+          image: lscr.io/linuxserver/jackett:latest
+          name: jackett
+          ports:
+            - containerPort: 9117
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "2000m"
+              memory: "2048Mi"
+            requests:
+              cpu: "500m"
+              memory: "256Mi"
+          volumeMounts:
+            - mountPath: /config
+              name: jackett-config
+        - env:                      # Bazarr container
+            - name: PGID
+              value: "3048"
+            - name: PUID
+              value: "3048"
+            - name: TZ
+              value: America/Chicago
+          image: lscr.io/linuxserver/bazarr:latest
+          name: bazarr
+          ports:
+            - containerPort: 6767
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "2000m"
+              memory: "2048Mi"
+            requests:
+              cpu: "500m"
+              memory: "256Mi"
+          volumeMounts:
+            - mountPath: /config
+              name: bazarr-config
+            - mountPath: /media
+              name: radarr-media
+      restartPolicy: Always
+      volumes:
+        - name: qb-config              # qBittorrent volumes
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/servicesTank/qbittorrent
+            readOnly: false
+        - name: radarr-config          # Radarr volumes
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/servicesTank/radarr
+            readOnly: false
+        - name: radarr-media           # Shared volume
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/cpool1/media
+            readOnly: false
+        - name: jackett-config           # Jackett volumes
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/servicesTank/jackett
+            readOnly: false
+        - name: bazarr-config           # Bazarr volumes
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/servicesTank/bazarr
+            readOnly: false
