@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: beta-jellyfin
+  name: jellyfin
   labels:
-    name: beta-jellyfin
+    name: jellyfin
 
 
 
@@ -12,13 +12,13 @@ metadata:
 kind: Service
 apiVersion: v1
 metadata:
-  name: beta-jellyfin-udp       # < name of the service
-  namespace: beta-jellyfin      # < namespace where to place service
+  name: jellyfin-udp       # < name of the service
+  namespace: jellyfin      # < namespace where to place service
   annotations:
-    metallb.universe.tf/allow-shared-ip: beta-jellyfin # < annotation name to combine the Service IP, make sure it's same name as in the service UDP yaml
+    metallb.universe.tf/allow-shared-ip: jellyfin # < annotation name to combine the Service IP, make sure it's same name as in the service UDP yaml
 spec:
   selector:
-    app: beta-jellyfin          # < reference to the deployment (connects the service with the deployment)
+    app: jellyfin          # < reference to the deployment (connects the service with the deployment)
   ports:
   - port: 1900             # < port to open on the outside on the server
     targetPort: 1900       # < targetport. port on the pod to passthrough
@@ -29,19 +29,19 @@ spec:
     name: discovery-udp
     protocol: UDP
   type: LoadBalancer
-  loadBalancerIP: 192.168.3.91 # < IP to access your jellyfinserver. Should be one from the MetalLB range and the same as the UDP yaml
+  loadBalancerIP: 192.168.3.81 # < IP to access your jellyfinserver. Should be one from the MetalLB range and the same as the UDP yaml
   sessionAffinity: ClientIP # This is necessary for multi-replica deployments
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: beta-jellyfin-tcp       # < name of the service
-  namespace: beta-jellyfin      # < namespace where to place service
+  name: jellyfin-tcp       # < name of the service
+  namespace: jellyfin      # < namespace where to place service
   annotations:
-    metallb.universe.tf/allow-shared-ip: beta-jellyfin # < annotation name to combine the Service IP, make sure it's same name as in the service UDP yaml
+    metallb.universe.tf/allow-shared-ip: jellyfin # < annotation name to combine the Service IP, make sure it's same name as in the service UDP yaml
 spec:
   selector:
-    app: beta-jellyfin          # < reference to the deployment (connects the service with the deployment)
+    app: jellyfin          # < reference to the deployment (connects the service with the deployment)
   ports:
   - port: 8096             # < port to open on the outside on the server
     targetPort: 8096       # < targetport. port on the pod to passthrough
@@ -51,7 +51,7 @@ spec:
     targetPort: 8920
     name: https-tcp
   type: LoadBalancer
-  loadBalancerIP: 192.168.3.91 # < IP to access your jellyfinserver. Should be one from the MetalLB range and the same as the TCP yaml
+  loadBalancerIP: 192.168.3.81 # < IP to access your jellyfinserver. Should be one from the MetalLB range and the same as the TCP yaml
   sessionAffinity: ClientIP # This is necessary for multi-replica deployments
 
 
@@ -60,8 +60,8 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: beta-jellyfin-pv-nfs-data   # < name of the persisant volume ("pv") in kubenetes
-  namespace: beta-jellyfin            # < namespace where place the pv
+  name: jellyfin-pv-nfs-data   # < name of the persisant volume ("pv") in kubenetes
+  namespace: jellyfin            # < namespace where place the pv
 spec:
   storageClassName: ""
   capacity:
@@ -70,15 +70,15 @@ spec:
     - ReadWriteMany                # < Multiple pods can write to storage 
   persistentVolumeReclaimPolicy: Retain # < The persistent volume can reclaimed 
   nfs:
-    path: /mnt/servicesTank/beta-jellyfin       # < Name of your NFS share with subfolder
+    path: /mnt/servicesTank/k3s-jellyfin       # < Name of your NFS share with subfolder
     server: 192.168.1.10      # < IP number of your NFS server
     readOnly: false
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: beta-jellyfin-pv-nfs-media
-  namespace: beta-jellyfin
+  name: jellyfin-pv-nfs-media
+  namespace: jellyfin
 spec:
   storageClassName: ""
   capacity:
@@ -97,11 +97,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: beta-jellyfin-pvc-data   # < name of the persistant volume claim ("pvc'")
-  namespace: beta-jellyfin         # < namespace where place the pvc
+  name: jellyfin-pvc-data   # < name of the persistant volume claim ("pvc'")
+  namespace: jellyfin         # < namespace where place the pvc
 spec:
   storageClassName: ""
-  volumeName: beta-jellyfin-pv-nfs-data  # < the pv it will "claim" to storage. Created in the previous yaml.
+  volumeName: jellyfin-pv-nfs-data  # < the pv it will "claim" to storage. Created in the previous yaml.
   accessModes:
     - ReadWriteMany             # < Multiple pods can write to storage. Same value as pv
   volumeMode: Filesystem
@@ -112,11 +112,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: beta-jellyfin-pvc-media
-  namespace: beta-jellyfin
+  name: jellyfin-pvc-media
+  namespace: jellyfin
 spec:
   storageClassName: ""
-  volumeName: beta-jellyfin-pv-nfs-media
+  volumeName: jellyfin-pv-nfs-media
   accessModes:
     - ReadWriteMany
   volumeMode: Filesystem
@@ -130,17 +130,17 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: beta-jellyfin
-  namespace: beta-jellyfin
+  name: jellyfin
+  namespace: jellyfin
 spec:
   selector:
     matchLabels:
-      app: beta-jellyfin
+      app: jellyfin
   replicas: 1
   template:
     metadata:
       labels:
-        app: beta-jellyfin
+        app: jellyfin
     spec:
       securityContext:
         fsGroup: 3048
@@ -149,14 +149,12 @@ spec:
           - 105
           - 226
       containers:
-      - name: beta-jellyfin
+      - name: jellyfin
         image: jellyfin/jellyfin
         command:
           - "/jellyfin/jellyfin"
         args:
           - "--datadir=/data"
-          - "--configdir=/data/config"
-          - "--logdir=/data/logs"
           - "--cachedir=/data/cache"
         volumeMounts:
         - name: data-volume
@@ -167,7 +165,7 @@ spec:
 #          mountPath: /dev/dri/renderD128          
         env:
         - name: JELLYFIN_PublishedServerUrl
-          value: 192.168.3.91
+          value: 192.168.3.81
         ports:
         - containerPort: 8096
           name: http-tcp
@@ -191,8 +189,8 @@ spec:
             memory: "256Mi"
         securityContext:                   # Container securityContext
           privileged: false
-          runAsUser: 103048
-          runAsGroup: 103048
+          runAsUser: 3048
+          runAsGroup: 3048
 #          allowPrivilegeEscalation: true
 #          capabilities:
 #            drop: ["ALL"]
@@ -211,10 +209,10 @@ spec:
       volumes:
       - name: data-volume
         persistentVolumeClaim:
-          claimName: beta-jellyfin-pvc-data
+          claimName: jellyfin-pvc-data
       - name: media-volume
         persistentVolumeClaim:
-          claimName: beta-jellyfin-pvc-media
+          claimName: jellyfin-pvc-media
 #      - name: intel-quicksync
 #        hostPath:
 #          path: /dev/dri/renderD128
