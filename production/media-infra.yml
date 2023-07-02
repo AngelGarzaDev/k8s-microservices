@@ -77,6 +77,22 @@ spec:
   type: LoadBalancer
   loadBalancerIP: 192.168.3.87
 
+---                           
+apiVersion: v1                # jellyseerr loadbalancer
+kind: Service
+metadata:
+  name: jellyseerr-lb
+  namespace: qbittorrent
+spec:
+  selector: 
+    app: qbittorrent
+  ports:
+    - name: 5055-jellyseerr
+      port: 5055
+      targetPort: 5055
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.88
+
 ---
 apiVersion: apps/v1           # Deployment
 kind: Deployment
@@ -194,6 +210,28 @@ spec:
               name: bazarr-config
             - mountPath: /media
               name: radarr-media
+        - env:                      # jellyseerr container
+            - name: PGID
+              value: "103050"
+            - name: PUID
+              value: "103050"
+            - name: TZ
+              value: America/Chicago
+          image: fallenbagel/jellyseerr:latest
+          name: jellyseerr
+          ports:
+            - containerPort: 5055
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "2000m"
+              memory: "2048Mi"
+            requests:
+              cpu: "500m"
+              memory: "256Mi"
+          volumeMounts:
+            - mountPath: /app/config
+              name: jellyseerr-config
       restartPolicy: Always
       volumes:
         - name: qb-config              # qBittorrent volumes
@@ -206,7 +244,7 @@ spec:
             server: 192.168.1.10
             path: /mnt/servicesTank/radarr
             readOnly: false
-        - name: radarr-media           # Shared volume
+        - name: radarr-media           # Shared media volume
           nfs:
             server: 192.168.1.10
             path: /mnt/cpool1/media
@@ -220,4 +258,9 @@ spec:
           nfs:
             server: 192.168.1.10
             path: /mnt/servicesTank/bazarr
+            readOnly: false
+        - name: jellyseerr-config           # jellyseerr volumes
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/servicesTank/jellyseerr
             readOnly: false
