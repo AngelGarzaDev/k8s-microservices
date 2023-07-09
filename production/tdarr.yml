@@ -4,7 +4,7 @@ metadata:
   labels:
     app: tdarr-server
   name: tdarr-server-lb
-  namespace: canary
+  namespace: production
 spec:
   ports:
   - name: 80-8265
@@ -20,7 +20,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: canary
+  namespace: production
   labels:
     app: tdarr-server
   name: tdarr-server

@@ -3,7 +3,7 @@ apiVersion: v1                 # loadbalancer
 kind: Service
 metadata:
   name: sonarr-lb
-  namespace: canary
+  namespace: production
 spec:
   selector: 
     app: sonarr
@@ -19,7 +19,7 @@ apiVersion: apps/v1           # Deployment
 kind: Deployment
 metadata:
   name: sonarr
-  namespace: canary
+  namespace: production
 spec:
   replicas: 1
   selector:
