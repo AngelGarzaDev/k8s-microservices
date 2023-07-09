@@ -1,0 +1,74 @@
+---                          
+apiVersion: v1                 # loadbalancer
+kind: Service
+metadata:
+  name: sonarr-lb
+  namespace: canary
+spec:
+  selector: 
+    app: sonarr
+  ports:
+    - name: sonarr-tcp
+      port: 80
+      targetPort: 8989
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.90
+
+---
+apiVersion: apps/v1           # Deployment
+kind: Deployment
+metadata:
+  name: sonarr
+  namespace: canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sonarr
+    spec:
+      securityContext:
+        fsGroup: 3048
+      containers:
+        - env:                  # Sonarr container
+            - name: PGID
+              value: "103054"
+            - name: PUID
+              value: "103054"
+            - name: TZ
+              value: Cst/UTC
+            - name: QBT_WEBUI_PORT
+              value: "8080"
+          image: lscr.io/linuxserver/sonarr:latest
+          name: sonarr
+          ports:
+            - containerPort: 8989
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "2000m"
+              memory: "2048Mi"
+            requests:
+              cpu: "500m"
+              memory: "256Mi"
+          volumeMounts:
+            - name: sonarr-config
+              mountPath: /config
+            - name: media
+              mountPath: /media
+      volumes:
+        - name: sonarr-config              # config volume
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/servicesTank/sonarr
+            readOnly: false
+        - name: media                         # media volume
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/cpool1/media
+            readOnly: false

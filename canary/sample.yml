@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nginx
+  name: nginx-lb
+  namespace: canary
+spec:
+  ports:
+  - name: 8080-80
+    port: 8080
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: nginx
+  type: LoadBalancer
+  loadBalancerIP: 192.168.4.90
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: canary
+  labels:
+    app: nginx
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources:
+            limits:
+              cpu: "2000m"
+              memory: "2048Mi"
+            requests:
+              cpu: "500m"
+              memory: "256Mi"

@@ -58,7 +58,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: polaris-tcp       
-#  namespace:              # < namespace where to place service
+  namespace: production              # < namespace where to place service
 spec:
   selector:
     app: polaris           # < reference to the deployment (connects the service with the deployment)

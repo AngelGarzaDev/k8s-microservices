@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: tdarr-server
+  name: tdarr-server-lb
+  namespace: canary
+spec:
+  ports:
+  - name: 80-8265
+    port: 80
+    protocol: TCP
+    targetPort: 8265
+  selector:
+    app: tdarr-server
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.89
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: canary
+  labels:
+    app: tdarr-server
+  name: tdarr-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tdarr-server
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: tdarr-server
+    spec:
+#      securityContext:
+#        fsGroup: 103052
+      containers:
+      - image: ghcr.io/haveagitgat/tdarr:latest
+        name: tdarr-server
+        resources:
+            limits:
+              cpu: "2000m"
+              memory: "2048Mi"
+            requests:
+              cpu: "500m"
+              memory: "256Mi"
+        env:
+        - name: TZ
+          value: America/Chicago
+        - name: PUID
+          value: "103052"
+        - name: PGID
+          value : "103052"
+        - name: internalNode
+          value: "true"
+        - name: inContainer
+          value: "true"
+        securityContext:
+          privileged: true
+#          runAsUser: 103052
+#          runAsGroup: 103052
+        volumeMounts:
+        - name: tdarr-config
+          mountPath: /app/config
+        - name: tdarr-server
+          mountPath: /app/server
+        - name: tdarr-logs
+          mountPath: /app/logs
+        - name: tdarr-temp
+          mountPath: /app/temp
+        - name: tdarr-media
+          mountPath: /media
+      volumes:
+        - name: tdarr-config              # tdarr volumes
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/servicesTank/tdarr/config
+            readOnly: false
+        - name: tdarr-server              # tdarr volumes
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/servicesTank/tdarr/server
+            readOnly: false
+        - name: tdarr-logs              # tdarr volumes
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/servicesTank/tdarr/logs
+            readOnly: false
+        - name: tdarr-temp              # tdarr volumes
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/servicesTank/tdarr/temp
+            readOnly: false
+        - name: tdarr-media           # media volume
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/cpool1/media
+            readOnly: false
