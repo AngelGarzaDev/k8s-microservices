@@ -135,7 +135,7 @@ spec:
               cpu: "2000m"
               memory: "2048Mi"
             requests:
-              cpu: "500m"
+              cpu: "250m"
               memory: "256Mi"
           volumeMounts:
             - mountPath: /config
@@ -157,7 +157,7 @@ spec:
               cpu: "2000m"
               memory: "2048Mi"
             requests:
-              cpu: "500m"
+              cpu: "250m"
               memory: "256Mi"
           volumeMounts:
             - mountPath: /config
@@ -181,7 +181,7 @@ spec:
               cpu: "2000m"
               memory: "2048Mi"
             requests:
-              cpu: "500m"
+              cpu: "250m"
               memory: "256Mi"
           volumeMounts:
             - mountPath: /config
@@ -203,7 +203,7 @@ spec:
               cpu: "2000m"
               memory: "2048Mi"
             requests:
-              cpu: "500m"
+              cpu: "250m"
               memory: "256Mi"
           volumeMounts:
             - mountPath: /config
@@ -239,11 +239,9 @@ spec:
             server: 192.168.1.10
             path: /mnt/servicesTank/qbittorrent
             readOnly: false
-        - name: radarr-config          # Radarr volumes
-          nfs:
-            server: 192.168.1.10
-            path: /mnt/servicesTank/radarr
-            readOnly: false
+        - name: radarr-config
+          persistentVolumeClaim:
+            claimName: radarr-config
         - name: radarr-media           # Shared media volume
           nfs:
             server: 192.168.1.10
@@ -264,3 +262,38 @@ spec:
             server: 192.168.1.10
             path: /mnt/servicesTank/jellyseerr
             readOnly: false
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: radarr-config
+spec:
+  capacity:
+    storage: 16Gi
+  accessModes:
+    - ReadWriteOnce
+  iscsi:
+     targetPortal: 192.168.1.10:3260
+     iqn: iqn.2005-10.org.freenas.ctl:radarr
+     lun: 0
+     fsType: 'ext4'
+     readOnly: false
+     chapAuthDiscovery: false
+     chapAuthSession: false
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: radarr-config
+  namespace: qbittorrent
+spec:
+  storageClassName: ""
+  volumeName: radarr-config
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 16Gi 
