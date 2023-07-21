@@ -1,0 +1,212 @@
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: canary-jellyfin-udp       # < name of the service
+  namespace: canary      # < namespace where to place service
+  annotations:
+    metallb.universe.tf/allow-shared-ip: canary-jellyfin # < annotation name to combine the Service IP, make sure it's same name as in the service UDP yaml
+spec:
+  selector:
+    app: canary-jellyfin          # < reference to the deployment (connects the service with the deployment)
+  ports:
+  - port: 1900             # < port to open on the outside on the server
+    targetPort: 1900       # < targetport. port on the pod to passthrough
+    name: dlna-udp         # < reference name for the port in the deployment yaml
+    protocol: UDP
+  - port: 7359
+    targetPort: 7359
+    name: discovery-udp
+    protocol: UDP
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.92 # < IP to access your jellyfinserver. Should be one from the MetalLB range and the same as the UDP yaml
+  sessionAffinity: ClientIP # This is necessary for multi-replica deployments
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: canary-jellyfin-tcp       # < name of the service
+  namespace: canary      # < namespace where to place service
+  annotations:
+    metallb.universe.tf/allow-shared-ip: canary-jellyfin # < annotation name to combine the Service IP, make sure it's same name as in the service UDP yaml
+spec:
+  selector:
+    app: canary-jellyfin          # < reference to the deployment (connects the service with the deployment)
+  ports:
+  - port: 80             # < port to open on the outside on the server
+    targetPort: 8096       # < targetport. port on the pod to passthrough
+    name: http-tcp         # < reference name for the port in the deployment yaml
+    protocol: TCP
+  - port: 8920
+    targetPort: 8920
+    name: https-tcp
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.92 # < IP to access your jellyfinserver. Should be one from the MetalLB range and the same as the TCP yaml
+  sessionAffinity: ClientIP # This is necessary for multi-replica deployments
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: canary-jellyfin-data
+spec:
+  capacity:
+    storage: 16Gi
+  accessModes:
+    - ReadWriteOnce
+  iscsi:
+     targetPortal: 192.168.1.10:3260
+#     portals: ['10.16.154.82:3260', '10.16.154.83:3260']
+     iqn: iqn.2005-10.org.freenas.ctl:jellyfin
+     lun: 0
+     fsType: 'ext4'
+     readOnly: false
+     chapAuthDiscovery: false
+     chapAuthSession: false
+#     secretRef:
+#       name: chap-secret
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: canary-jellyfin-media
+  namespace: canary
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 8Gi                   # < max. size we reserve for the pv. A bigger value than the configdata
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /mnt/cpool1/media          
+    server: 192.168.1.10
+    readOnly: false
+
+
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: canary-jellyfin-data   # < name of the persistant volume claim ("pvc'")
+  namespace: canary         # < namespace where place the pvc
+spec:
+  storageClassName: ""
+  volumeName: canary-jellyfin-data  # < the pv it will "claim" to storage. Created in the previous yaml.
+  accessModes:
+    - ReadWriteOnce             # < Multiple pods can write to storage. Same value as pv
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 16Gi              # < How much data can the pvc claim from pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: canary-jellyfin-media
+  namespace: canary
+spec:
+  storageClassName: ""
+  volumeName: canary-jellyfin-media
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 8Gi
+
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canary-jellyfin
+  namespace: canary
+spec:
+  selector:
+    matchLabels:
+      app: canary-jellyfin
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: canary-jellyfin
+    spec:
+      securityContext:
+        fsGroup: 3048
+        supplementalGroups: 
+          - 44
+          - 105
+          - 226
+      containers:
+      - name: canary-jellyfin
+        image: jellyfin/jellyfin
+        command:
+          - "/jellyfin/jellyfin"
+        args:
+          - "--datadir=/data"
+          - "--cachedir=/data/cache"
+          - "--logdir=/data/log"
+        volumeMounts:
+        - name: data-volume
+          mountPath: /data
+        - name: media-volume
+          mountPath: /media         
+        env:
+        - name: JELLYFIN_PublishedServerUrl
+          value: 192.168.3.92
+        ports:
+        - containerPort: 8096
+          name: http-tcp
+          protocol: TCP
+        - containerPort: 8920
+          name: https-tcp
+          protocol: TCP
+        - containerPort: 1900
+          name: dlna-udp
+          protocol: UDP
+        - containerPort: 7359
+          name: discovery-udp
+          protocol: UDP 
+        resources:
+          limits:
+            cpu: "2000m"
+            memory: "2048Mi"
+            gpu.intel.com/i915: 1
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+        securityContext:                   # Container securityContext
+          privileged: false
+          runAsUser: 3048
+          runAsGroup: 3048
+      restartPolicy: "Always"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: host
+                operator: In
+                values:
+                - metal
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: canary-jellyfin-data
+      - name: media-volume
+        persistentVolumeClaim:
+          claimName: canary-jellyfin-media
+#      - name: intel-quicksync
+#        hostPath:
+#          path: /dev/dri/renderD128
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
