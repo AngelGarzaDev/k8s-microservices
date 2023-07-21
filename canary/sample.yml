@@ -45,3 +45,26 @@ spec:
             requests:
               cpu: "500m"
               memory: "256Mi"
+
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: iscsi-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  iscsi:
+     targetPortal: 192.168.1.10:3260
+#     portals: ['10.16.154.82:3260', '10.16.154.83:3260']
+     iqn: iqn.2005-10.org.freenas.ctl:jellyfin
+     lun: 0
+     fsType: 'ext4'
+     readOnly: false
+     chapAuthDiscovery: false
+     chapAuthSession: false
+#     secretRef:
+#       name: chap-secret
