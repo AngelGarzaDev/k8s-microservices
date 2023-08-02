@@ -38,7 +38,7 @@ spec:
     targetPort: 8096       # < targetport. port on the pod to passthrough
     name: http-tcp         # < reference name for the port in the deployment yaml
     protocol: TCP
-  - port: 8920
+  - port: 443
     targetPort: 8920
     name: https-tcp
   type: LoadBalancer
@@ -57,7 +57,6 @@ spec:
     - ReadWriteOnce
   iscsi:
      targetPortal: 192.168.1.10:3260
-#     portals: ['10.16.154.82:3260', '10.16.154.83:3260']
      iqn: iqn.2005-10.org.freenas.ctl:jellyfin
      lun: 0
      fsType: 'ext4'
@@ -176,7 +175,7 @@ spec:
           limits:
             cpu: "2000m"
             memory: "2048Mi"
-            gpu.intel.com/i915: 1
+            gpu.intel.com/i915: "1"
           requests:
             cpu: "250m"
             memory: "256Mi"
@@ -202,9 +201,6 @@ spec:
       - name: media-volume
         persistentVolumeClaim:
           claimName: canary-jellyfin-media
-#      - name: intel-quicksync
-#        hostPath:
-#          path: /dev/dri/renderD128
   strategy:
     type: RollingUpdate
     rollingUpdate:
