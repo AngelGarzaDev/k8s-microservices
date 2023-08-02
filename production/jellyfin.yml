@@ -183,7 +183,7 @@ spec:
           limits:
             cpu: "2000m"
             memory: "2048Mi"
-            gpu.intel.com/i915: 1
+            gpu.intel.com/i915: "1"
           requests:
             cpu: "500m"
             memory: "256Mi"
