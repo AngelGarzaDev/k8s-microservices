@@ -1,0 +1,143 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: deluge
+  name: deluge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deluge
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: deluge
+    spec:
+      securityContext:
+        fsGroup: 103056
+      containers:
+      - image: lscr.io/linuxserver/deluge:latest
+        name: deluge
+#        env:
+#        - name: PUID
+#          value: "103056"
+        resources:
+          limits:
+            cpu: "2000m"
+            memory: "2048Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+        volumeMounts:
+        - name: deluge-config
+          mountPath: /config
+        - name: deluge-media
+          mountPath: /media
+        ports:
+        - containerPort: 8112
+          protocol: TCP
+        - containerPort: 6881
+          protocol: TCP
+        - containerPort: 6881
+          protocol: UDP
+        securityContext:
+          runAsUser: 0
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      volumes:
+      - name: deluge-config
+        persistentVolumeClaim:
+          claimName: deluge-config-pvc
+      - name: deluge-media
+        persistentVolumeClaim:
+          claimName: deluge-media-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: deluge
+  name: deluge
+spec:
+  ports:
+  - name: deluge-8112
+    port: 8112
+    protocol: TCP
+    targetPort: 8112
+  - name: deluge-6881
+    port: 6881
+    protocol: TCP
+    targetPort: 6881
+  - name: deluge-6881udp
+    port: 6881
+    protocol: UDP
+    targetPort: 6881
+  selector:
+    app: deluge
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: deluge-config-pv
+spec:
+  capacity:
+    storage: 16Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /mnt/servicesTank/deluge
+    server: 192.168.1.10
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: deluge-config-pvc
+spec:
+  volumeName: deluge-config-pv
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 16Gi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: deluge-media-pv
+spec:
+  capacity:
+    storage: 16Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /mnt/cpool1/media
+    server: 192.168.1.10
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: deluge-media-pvc
+spec:
+  volumeName: deluge-media-pv
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 16Gi     
+
