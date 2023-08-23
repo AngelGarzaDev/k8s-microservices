@@ -12,3 +12,10 @@ metadata:
   name: canary
   labels:
     name: canary
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nextcloud
+  labels:
+    name: nextcloud
