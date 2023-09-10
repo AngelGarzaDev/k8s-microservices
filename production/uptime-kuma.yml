@@ -59,9 +59,9 @@ spec:
   capacity:
     storage: 1Gi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: uptime-data
+  storageClassName: ""
   nfs:
     path: /mnt/servicesTank/uptimekuma       # < Name of your NFS share with subfolder
     server: 192.168.1.10      # < IP number of your NFS server
@@ -74,9 +74,9 @@ metadata:
   name: uptime-data-claim
   namespace: uptime-kuma
 spec:
-  storageClassName: uptime-data
+  storageClassName: ""
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi

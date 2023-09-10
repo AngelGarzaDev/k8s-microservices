@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: nextcloud
+  name: nextcloud
+  namespace: nextcloud-statefulset
+spec:
+  replicas: 3
+  serviceName: "nextcloud"
+  selector:
+    matchLabels:
+      app: nextcloud
+  template:
+    metadata:
+      labels:
+        app: nextcloud
+    spec:
+      containers:
+#      - image: nextcloud:27-apache
+#        name: nextcloud
+#        env:
+#        - name: POSTGRES_USER
+#          value: dbadmin
+#        - name: POSTGRES_PASSWORD
+#          value: 8GQ8qLkZ_Afunm2hNW@h87XaMvysyB6M
+#        - name: POSTGRES_DB
+#          value: nextcloud-db
+#        - name: POSTGRES_HOST
+#          value: localhost
+#        resources: {}
+#        volumeMounts:
+#        - name: nextcloud-data-storage
+#          mountPath: /var/www/html
+#        securityContext:
+#          runAsUser: 103060
+#          allowPrivilegeEscalation: false
+      - image: postgres:14-alpine
+        name: nextcloud-db
+        env:
+        - name: POSTGRES_USER
+          value: dbadmin
+        - name: POSTGRES_PASSWORD
+          value: 8GQ8qLkZ_Afunm2hNW@h87XaMvysyB6M
+        - name: POSTGRES_DB
+          value: nextcloud-db
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        securityContext:
+          runAsUser: 103058
+          allowPrivilegeEscalation: false
+        resources: {}
+        volumeMounts:
+        - name: postgres
+          mountPath: /var/lib/postgresql/data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+  volumeClaimTemplates:
+#      - name: data-volume
+#        spec:
+#          accessModes: ReadWriteOnce
+#          storageClassName: ""
+#          resources:
+#            requessts:
+#              storage: 16Gi
+  - metadata:
+      name: postgres
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: ""
+      resources:
+        requests:
+          storage: 32Gi
