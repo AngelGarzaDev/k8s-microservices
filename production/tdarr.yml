@@ -35,18 +35,24 @@ spec:
       labels:
         app: tdarr-server
     spec:
-#      securityContext:
+      securityContext:
 #        fsGroup: 103052
+        supplementalGroups: 
+          - 44
+          - 105
+          - 226
       containers:
       - image: ghcr.io/haveagitgat/tdarr:latest
         name: tdarr-server
         resources:
             limits:
-              cpu: "2000m"
-              memory: "2048Mi"
+              cpu: "6000m"
+              memory: "16Gi"
+              gpu.intel.com/i915: "1"
             requests:
               cpu: "500m"
               memory: "256Mi"
+#        imagePullPolicy: IfNotPresent
         env:
         - name: TZ
           value: America/Chicago
