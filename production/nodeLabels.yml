@@ -4,6 +4,7 @@ metadata:
   name: hwnode-1
   labels:
     host: metal
+    gpu: qsv
 ---
 apiVersion: v1
 kind: Node

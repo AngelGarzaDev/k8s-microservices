@@ -55,16 +55,16 @@ spec:
           readOnly: true
         - name: kubeletsockets
           mountPath: /var/lib/kubelet/device-plugins
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 1
-            preference:
-              matchExpressions:
-              - key: host
-                operator: In
-                values:
-                - metal
+#      affinity:
+#        nodeAffinity:
+#          preferredDuringSchedulingIgnoredDuringExecution:
+#          - weight: 1
+#            preference:
+#              matchExpressions:
+#              - key: gpu
+#                operator: In
+#                values:
+#                - qsv
       volumes:
       - name: devfs
         hostPath:
@@ -80,4 +80,4 @@ spec:
           path: /etc/kubernetes/node-feature-discovery/source.d/
           type: DirectoryOrCreate
       nodeSelector:
-        kubernetes.io/arch: amd64
+        gpu: qsv

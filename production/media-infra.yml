@@ -147,7 +147,7 @@ spec:
               value: "3048"
             - name: TZ
               value: Cst/UTC
-          image: lscr.io/linuxserver/radarr:latest
+          image: hotio/radarr
           name: radarr
           ports:
             - containerPort: 7878
