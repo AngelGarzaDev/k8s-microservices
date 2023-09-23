@@ -146,7 +146,7 @@ spec:
             - name: PUID
               value: "3048"
             - name: TZ
-              value: Cst/UTC
+              value: America/Chicago
           image: hotio/radarr
           name: radarr
           ports:
