@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: protonvpn
+  name: protonvpn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: protonvpn
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: protonvpn
+    spec:
+      containers:
+      - image: qmcgaw/gluetun:latest
+        name: gluetun
+        resources: {}
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN"]
+        env:
+        - name: VPN_SERVICE_PROVIDER
+          value: "protonvpn"
+        - name: VPN_TYPE
+          value: "wireguard"
+        - name: VPN_PORT_FORWARDING
+          value: "on"
+        - name: VPN_PORT_FORWARDING_PROVIDER
+          value: "protonvpn"
+        - name: WIREGUARD_PRIVATE_KEY
+          value: ""
+        - name: WIREGUARD_ADDRESSES
+          value: ""
