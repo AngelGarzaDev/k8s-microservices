@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+apiVersion: apps/v1            # Deployment
 kind: Deployment
 metadata:
   labels:
@@ -19,9 +19,26 @@ spec:
       - image: deluan/navidrome:develop
         name: navidrome
         resources: {}
+        volumeMounts:
+        - name: data-vol
+          mountPath: /data
+        - name: music-vol
+          mountPath: /music
+      securityContext:
+        runAsUser: 103062
+        runAsGroup: 103062
+      volumes:
+      - name: data-vol
+        persistentVolumeClaim:
+          claimName: navidrome-pvc
+      - name: music-vol
+        nfs:
+          server: 192.168.1.10
+          path: /mnt/cpool1/media/music
+          readOnly: false
 
 ---
-apiVersion: v1
+apiVersion: v1                  # Load Balancer
 kind: Service
 metadata:
   labels:
@@ -35,3 +52,38 @@ spec:
   selector:
     app: navidrome
   type: LoadBalancer
+
+---
+apiVersion: v1                  # Persistent Volume
+kind: PersistentVolume
+metadata:
+  name: navidrome-pv
+spec:
+  capacity:
+    storage: 16Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  mountOptions:
+    - nfsvers=4.1
+#  claimRef:
+#    name: navidrome-pvc
+  nfs:
+    path: /mnt/servicesTank/navidrome
+    server: 192.168.1.10
+
+---
+apiVersion: v1                   # Persistent Volume Claim
+kind: PersistentVolumeClaim
+metadata:
+  name: navidrome-pvc
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 16Gi
+  volumeName: navidrome-pv
