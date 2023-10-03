@@ -26,12 +26,12 @@ spec:
         - name: VPN_SERVICE_PROVIDER
           value: "protonvpn"
         - name: VPN_TYPE
-          value: "wireguard"
+          value: "openvpn"
         - name: VPN_PORT_FORWARDING
           value: "on"
         - name: VPN_PORT_FORWARDING_PROVIDER
           value: "protonvpn"
-        - name: WIREGUARD_PRIVATE_KEY
+        - name: OPENVPN_USER
           value: ""
-        - name: WIREGUARD_ADDRESSES
+        - name: OPENVPN_PASSWORD
           value: ""
