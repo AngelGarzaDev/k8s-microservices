@@ -140,6 +140,8 @@ spec:
           volumeMounts:
             - mountPath: /config
               name: qb-config
+            - mountPath: /media
+              name: radarr-media
         - env:                      #Radarr container
             - name: PGID
               value: "3048"
@@ -232,6 +234,27 @@ spec:
           volumeMounts:
             - mountPath: /app/config
               name: jellyseerr-config
+        - image: qmcgaw/gluetun:latest
+          name: gluetun
+          resources: {}
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"]
+          env:
+          - name: VPN_SERVICE_PROVIDER
+            value: "protonvpn"
+          - name: VPN_TYPE
+            value: "openvpn"
+          - name: VPN_PORT_FORWARDING
+            value: "on"
+          - name: VPN_PORT_FORWARDING_PROVIDER
+            value: "protonvpn"
+          - name: OPENVPN_USER
+            value: "cXYz2ypNjJIt2pJC+pmp"
+          - name: OPENVPN_PASSWORD
+            value: "0da5KkFMcwib01oNXcTcOSCgXCwIDV80"
+          - name: SERVER_COUNTRIES
+            value: "United States"
       restartPolicy: Always
       volumes:
         - name: qb-config              # qBittorrent volumes
