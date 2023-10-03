@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: jellyfin-ss
+  name: jellyfin-ss
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jellyfin-ss
+  template:
+    metadata:
+      labels:
+        app: jellyfin-ss
+    spec:
+      containers:
+      - image: jellyfin/jellyfin
+        name: jellyfin
+        resources: {}
