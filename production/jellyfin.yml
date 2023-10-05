@@ -126,7 +126,10 @@ spec:
             mountPath: /data
           - name: media-volume
             mountPath: /media
-
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8096
       securityContext:
         runAsUser: 103064
         runAsGroup: 103064
