@@ -1,20 +1,152 @@
+---                                             # Load Balancer
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: jellyfin
+  name: jellyfin
+  namespace: production
+spec:
+  ports:
+  - port: 8096
+    protocol: TCP
+    targetPort: 8096
+  selector:
+    app: jellyfin
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.91
+
+---                                            # Persistent Volume - Data
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-data
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 16Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /mnt/servicesTank/jellyfin
+    server: 192.168.1.10
+    readOnly: false
+
+---                                            # Persistent Volume Claim - Data
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-data
+  namespace: production
+spec:
+  storageClassName: ""
+  volumeName: jellyfin-data
+  accessModes: 
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 16Gi
+
+---                                            # Persistent Volume - Media
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-media
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 16Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /mnt/cpool1/media
+    server: 192.168.1.10
+    readOnly: false
+
+---                                            # Persistent Volume Claim - Media
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-media
+  namespace: production
+spec:
+  storageClassName: ""
+  volumeName: jellyfin-media
+  accessModes: 
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 16Gi
+
+---                                             # Stateful Set
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    app: jellyfin-ss
-  name: jellyfin-ss
+    app: jellyfin
+  name: jellyfin
+  namespace: production
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: jellyfin-ss
+      app: jellyfin
+  serviceName: jellyfin
   template:
     metadata:
       labels:
-        app: jellyfin-ss
+        app: jellyfin
     spec:
-      containers:
+      containers:                              # Container
       - image: jellyfin/jellyfin
         name: jellyfin
-        resources: {}
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "500M"
+          limits:
+            cpu: "4000m"
+            memory: "4G"
+            gpu.intel.com/i915: "1"
+        env:
+        - name: JELLYFIN_PublishedServerUrl
+          value: 192.168.3.91
+        - name: JELLYFIN_DATA_DIR
+          value: /data
+        - name: JELLYFIN_CACHE_DIR
+          value: /data/cache
+        - name: JELLYFIN_CONFIG_DIR
+          value: /data/config
+        - name: JELLYFIN_LOG_DIR
+          value: /data/config/log
+        volumeMounts:
+          - name: data-vol
+            mountPath: /data
+          - name: media-volume
+            mountPath: /media
+      securityContext:
+        runAsUser: 103064
+        runAsGroup: 103064
+        supplementalGroups: 
+          - 44
+          - 105
+          - 226
+      volumes:
+      - name: data-vol
+        persistentVolumeClaim:
+          claimName: jellyfin-data
+      - name: media-volume
+        persistentVolumeClaim:
+          claimName: jellyfin-media
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: host
+                operator: In
+                values:
+                - metal
