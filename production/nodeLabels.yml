@@ -9,6 +9,6 @@ metadata:
 apiVersion: v1
 kind: Node
 metadata:
-  name: k3s-a
+  name: k3s-d
   labels:
     host: virtual
