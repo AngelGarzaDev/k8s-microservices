@@ -4,6 +4,7 @@ metadata:
   labels:
     app: navidrome
   name: navidrome
+  namespace: production
 spec:
   replicas: 1
   selector:
@@ -18,7 +19,13 @@ spec:
       containers:
       - image: deluan/navidrome:develop
         name: navidrome
-        resources: {}
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
         volumeMounts:
         - name: data-vol
           mountPath: /data
@@ -44,6 +51,7 @@ metadata:
   labels:
     app: navidrome
   name: navidrome-lb
+  namespace: production
 spec:
   ports:
   - port: 4533
@@ -79,6 +87,7 @@ apiVersion: v1                   # Persistent Volume Claim
 kind: PersistentVolumeClaim
 metadata:
   name: navidrome-pvc
+  namespace: production
 spec:
   storageClassName: ""
   accessModes:
