@@ -19,3 +19,10 @@ metadata:
   name: nextcloud
   labels:
     name: nextcloud
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: qbittorrent
+  labels:
+    name: qbittorrent
