@@ -9,3 +9,8 @@ persistent volumes cannot be created imperatively
 
 # Get shell access to container
 kubectl exec --stdin --tty deluge-5576cb5457-qz7h6 -- /bin/bash
+
+# Change Deployment to StatefulSet
+    1. Create headless service
+    2. Change Kind to statefulSet
+    3. Remove spec.stragety
