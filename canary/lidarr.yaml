@@ -1,0 +1,61 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: lidarr
+  name: lidarr
+spec:
+  ports:
+  - name: "8686"
+    port: 8686
+    protocol: TCP
+    targetPort: 8686
+  selector:
+    app: lidarr
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: lidarr
+  name: lidarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lidarr
+  serviceName: lidarr
+  template:
+    metadata:
+      labels:
+        app: lidarr
+    spec:
+      containers:
+      - image: linuxserver/lidarr:1.4.5
+        name: lidarr
+        ports:
+        - containerPort: 8686
+        resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: lidarr
+    apps.kubernetes.io/pod-index: "0"
+    controller-revision-hash: lidarr-655487cc46
+    statefulset.kubernetes.io/pod-name: lidarr-0
+  name: lidarr-lb
+spec:
+  ports:
+  - port: 8686
+    protocol: TCP
+    targetPort: 8686
+  selector:
+    app: lidarr
+    apps.kubernetes.io/pod-index: "0"
+    controller-revision-hash: lidarr-655487cc46
+    statefulset.kubernetes.io/pod-name: lidarr-0
+  type: LoadBalancer
