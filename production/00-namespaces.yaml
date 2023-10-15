@@ -26,3 +26,8 @@ metadata:
   name: qbittorrent
   labels:
     name: qbittorrent
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: media
