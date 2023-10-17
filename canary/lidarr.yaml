@@ -59,3 +59,19 @@ spec:
     controller-revision-hash: lidarr-655487cc46
     statefulset.kubernetes.io/pod-name: lidarr-0
   type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lidarr-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 16Gi
+  storageClassName: freenas-nfs-csi
+#  selector:
+#    matchLabels:
+#      app: lidarr
