@@ -6,7 +6,7 @@ csiDriver:
 storageClasses:
 - name: freenas-nfs-csi
   defaultClass: false
-  reclaimPolicy: Delete
+  reclaimPolicy: Retain
   volumeBindingMode: Immediate
   allowVolumeExpansion: true
   parameters:
@@ -56,8 +56,8 @@ driver:
       # if both are present, apiKey is preferred
       # apiKey is only available starting in TrueNAS-12
       apiKey: 1-ULPJo7WtRcTg2ttnbB1aKwbJPYSlWM9WXzAz8Puj9jBgsGleGL33XkS9TyCDmVCD
-      username: csi
-      password: yRefqmaUZ3ULoQn3gi9SRIAWBr
+#      username: 
+#      password: 
       allowInsecure: true
       # use apiVersion 2 for TrueNAS-12 and up (will work on 11.x in some scenarios as well)
       # leave unset for auto-detection
@@ -65,8 +65,8 @@ driver:
     zfs:
       # can be used to override defaults if necessary
       # the example below is useful for TrueNAS 12
-      cli:
-        sudoEnabled: true
+#      cli:
+#        sudoEnabled: true
       #
       #  leave paths unset for auto-detection
       #  paths:
@@ -77,12 +77,12 @@ driver:
       
       # can be used to set arbitrary values on the dataset/zvol
       # can use handlebars templates with the parameters from the storage class/CO
-      #datasetProperties:
-      #  "org.freenas:description": "{{ parameters.[csi.storage.k8s.io/pvc/namespace] }}/{{ parameters.[csi.storage.k8s.io/pvc/name] }}"
+      datasetProperties:
+        "org.freenas:description": "{{ parameters.[csi.storage.k8s.io/pvc/namespace] }}/{{ parameters.[csi.storage.k8s.io/pvc/name] }}"
       #  "org.freenas:test": "{{ parameters.foo }}"
       #  "org.freenas:test2": "some value"
 
-      datasetParentName: csi/nfs
+      datasetParentName: servicesTank/csi/nfs
       # do NOT make datasetParentName and detachedSnapshotsDatasetParentName overlap
       # they may be siblings, but neither should be nested in the other
       # do NOT comment this option out even if you don't plan to use snapshots, just leave it with dummy value
