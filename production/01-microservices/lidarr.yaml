@@ -38,15 +38,32 @@ spec:
         ports:
         - containerPort: 8686
         resources: {}
+        volumeMounts:
+        - name: data
+          mountPath: /config
+        - name: music
+          mountPath: /music
+      volumes:
+      - name: music
+        nfs:
+          server: 192.168.1.10
+          path: /mnt/cpool1/media/music
+          readOnly: false
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: freenas-nfs-csi
+      resources:
+        requests:
+          storage: 16Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
     app: lidarr
-    apps.kubernetes.io/pod-index: "0"
-    controller-revision-hash: lidarr-655487cc46
-    statefulset.kubernetes.io/pod-name: lidarr-0
   name: lidarr-lb
 spec:
   ports:
@@ -55,23 +72,5 @@ spec:
     targetPort: 8686
   selector:
     app: lidarr
-    apps.kubernetes.io/pod-index: "0"
-    controller-revision-hash: lidarr-655487cc46
-    statefulset.kubernetes.io/pod-name: lidarr-0
   type: LoadBalancer
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: lidarr-data
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 16Gi
-  storageClassName: freenas-nfs-csi
-#  selector:
-#    matchLabels:
-#      app: lidarr
