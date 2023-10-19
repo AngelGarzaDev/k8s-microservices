@@ -5,12 +5,8 @@ metadata:
   labels:
     app: lidarr
   name: lidarr
+  namespace: media-acq
 spec:
-  ports:
-  - name: "8686"
-    port: 8686
-    protocol: TCP
-    targetPort: 8686
   selector:
     app: lidarr
   clusterIP: None
@@ -21,6 +17,7 @@ metadata:
   labels:
     app: lidarr
   name: lidarr
+  namespace: media-acq
 spec:
   replicas: 1
   selector:
@@ -43,11 +40,18 @@ spec:
           mountPath: /config
         - name: music
           mountPath: /music
+        - name: downloads
+          mountPath: media/downloads
       volumes:
       - name: music
         nfs:
           server: 192.168.1.10
           path: /mnt/cpool1/media/music
+          readOnly: false
+      - name: downloads
+        nfs:
+          server: 192.168.1.10
+          path: /mnt/cpool1/media/downloads
           readOnly: false
   volumeClaimTemplates:
   - metadata:
@@ -65,6 +69,7 @@ metadata:
   labels:
     app: lidarr
   name: lidarr-lb
+  namespace: media-acq
 spec:
   ports:
   - port: 8686
@@ -73,4 +78,3 @@ spec:
   selector:
     app: lidarr
   type: LoadBalancer
----
