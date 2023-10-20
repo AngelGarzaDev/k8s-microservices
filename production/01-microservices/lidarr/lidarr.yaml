@@ -49,12 +49,12 @@ spec:
         - name: downloads
           mountPath: media/downloads
         securityContext:
-          allowPrivilegeEscalation: false
+          allowPrivilegeEscalation: true # linuxserver.io requirement
           readOnlyRootFilesystem: false # not a best practice
           runAsNonRoot: false         # not a best practice. linuxserver.io containers require root privilege
-          capabilities:
-            drop: 
-            - all
+#          capabilities:
+#            drop: 
+#            - all
 #          runAsUser: 103060          # linuxserver.io containers require root privilege
       volumes:
       - name: music
