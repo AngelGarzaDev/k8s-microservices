@@ -4,6 +4,7 @@ kind: Service
 metadata:
   labels:
     app: lidarr
+    use: media-infra
   name: lidarr
   namespace: media-acq
 spec:
@@ -16,6 +17,7 @@ kind: StatefulSet
 metadata:
   labels:
     app: lidarr
+    use: media-infra
   name: lidarr
   namespace: media-acq
 spec:
@@ -28,6 +30,7 @@ spec:
     metadata:
       labels:
         app: lidarr
+        use: media-infra
     spec:
       containers:
       - image: linuxserver/lidarr:1.4.5
@@ -49,7 +52,7 @@ spec:
         - name: downloads
           mountPath: media/downloads
         securityContext:
-          allowPrivilegeEscalation: true # linuxserver.io requirement
+          allowPrivilegeEscalation: true # not a best practice. linuxserver.io requirement
           readOnlyRootFilesystem: false # not a best practice
           runAsNonRoot: false         # not a best practice. linuxserver.io containers require root privilege
 #          capabilities:
@@ -82,6 +85,7 @@ kind: Service
 metadata:
   labels:
     app: lidarr
+    use: media-infra
   name: lidarr-lb
   namespace: media-acq
 spec:
