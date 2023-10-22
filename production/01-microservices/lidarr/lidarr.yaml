@@ -34,7 +34,13 @@ spec:
         name: lidarr
         ports:
         - containerPort: 8686
-        resources: {}
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "250M"
+          limits:
+            cpu: "4000m"
+            memory: "4G"
         volumeMounts:
         - name: data
           mountPath: /config
@@ -42,6 +48,14 @@ spec:
           mountPath: /music
         - name: downloads
           mountPath: media/downloads
+        securityContext:
+          allowPrivilegeEscalation: true # linuxserver.io requirement
+          readOnlyRootFilesystem: false # not a best practice
+          runAsNonRoot: false         # not a best practice. linuxserver.io containers require root privilege
+#          capabilities:
+#            drop: 
+#            - all
+#          runAsUser: 103060          # linuxserver.io containers require root privilege
       volumes:
       - name: music
         nfs:
