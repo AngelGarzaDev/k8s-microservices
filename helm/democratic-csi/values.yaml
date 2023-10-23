@@ -56,8 +56,8 @@ driver:
       # if both are present, apiKey is preferred
       # apiKey is only available starting in TrueNAS-12
       apiKey: 1-ULPJo7WtRcTg2ttnbB1aKwbJPYSlWM9WXzAz8Puj9jBgsGleGL33XkS9TyCDmVCD
-#      username: 
-#      password: 
+      username: csi
+      password: yRefqmaUZ3ULoQn3gi9SRIAWBr
       allowInsecure: true
       # use apiVersion 2 for TrueNAS-12 and up (will work on 11.x in some scenarios as well)
       # leave unset for auto-detection
