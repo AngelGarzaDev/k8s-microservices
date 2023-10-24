@@ -90,8 +90,8 @@ driver:
       datasetEnableQuotas: true
       datasetEnableReservation: false
       datasetPermissionsMode: "0777"
-      datasetPermissionsUser: 0
-      datasetPermissionsGroup: 0
+      datasetPermissionsUser: 103048
+      datasetPermissionsGroup: 103048
 
       # not supported yet
       #datasetPermissionsAcls:
