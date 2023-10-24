@@ -21,54 +21,6 @@ spec:
   type: LoadBalancer
   loadBalancerIP: 192.168.3.84
 
----                          
-apiVersion: v1                 # Radarr loadbalancer
-kind: Service
-metadata:
-  name: radarr-lb
-  namespace: qbittorrent
-spec:
-  selector: 
-    app: qbittorrent
-  ports:
-    - name: 7878-tcp
-      port: 7878
-      targetPort: 7878
-  type: LoadBalancer
-  loadBalancerIP: 192.168.3.85
-
----                           
-apiVersion: v1                # Jackett loadbalancer
-kind: Service
-metadata:
-  name: jackett-lb
-  namespace: qbittorrent
-spec:
-  selector: 
-    app: qbittorrent
-  ports:
-    - name: 9117-jackett
-      port: 9117
-      targetPort: 9117
-  type: LoadBalancer
-  loadBalancerIP: 192.168.3.86
-
----                           
-apiVersion: v1                # Bazarr loadbalancer
-kind: Service
-metadata:
-  name: bazarr-lb
-  namespace: qbittorrent
-spec:
-  selector: 
-    app: qbittorrent
-  ports:
-    - name: 6767-bazarr
-      port: 6767
-      targetPort: 6767
-  type: LoadBalancer
-  loadBalancerIP: 192.168.3.87
-
 ---                           
 apiVersion: v1                # jellyseerr loadbalancer
 kind: Service
@@ -84,22 +36,6 @@ spec:
       targetPort: 5055
   type: LoadBalancer
   loadBalancerIP: 192.168.3.88
-
----                          
-apiVersion: v1                 # Sonarr loadbalancer
-kind: Service
-metadata:
-  name: sonarr-lb
-  namespace: qbittorrent
-spec:
-  selector: 
-    app: qbittorrent
-  ports:
-    - name: sonarr-tcp
-      port: 8989
-      targetPort: 8989
-  type: LoadBalancer
-  loadBalancerIP: 192.168.3.90
 
 ---
 apiVersion: apps/v1           # Deployment
@@ -150,76 +86,6 @@ spec:
               name: qb-config
             - mountPath: /media
               name: radarr-media
-        - env:                      #Radarr container
-            - name: PGID
-              value: "3048"
-            - name: PUID
-              value: "3048"
-            - name: TZ
-              value: America/Chicago
-          image: hotio/radarr
-          name: radarr
-          ports:
-            - containerPort: 7878
-              protocol: TCP
-          resources:
-            limits:
-              cpu: "2000m"
-              memory: "2048Mi"
-            requests:
-              cpu: "250m"
-              memory: "256Mi"
-          volumeMounts:
-            - mountPath: /config
-              name: radarr-config
-            - mountPath: /media
-              name: radarr-media
-        - env:                      # Jackett container
-            - name: PGID
-              value: "3048"
-            - name: PUID
-              value: "3048"
-            - name: TZ
-              value: Cst/UTC
-          image: lscr.io/linuxserver/jackett:latest
-          name: jackett
-          ports:
-            - containerPort: 9117
-              protocol: TCP
-          resources:
-            limits:
-              cpu: "2000m"
-              memory: "2048Mi"
-            requests:
-              cpu: "250m"
-              memory: "256Mi"
-          volumeMounts:
-            - mountPath: /config
-              name: jackett-config
-        - env:                      # Bazarr container
-            - name: PGID
-              value: "3048"
-            - name: PUID
-              value: "3048"
-            - name: TZ
-              value: America/Chicago
-          image: lscr.io/linuxserver/bazarr:latest
-          name: bazarr
-          ports:
-            - containerPort: 6767
-              protocol: TCP
-          resources:
-            limits:
-              cpu: "2000m"
-              memory: "2048Mi"
-            requests:
-              cpu: "250m"
-              memory: "256Mi"
-          volumeMounts:
-            - mountPath: /config
-              name: bazarr-config
-            - mountPath: /media
-              name: radarr-media
         - env:                      # jellyseerr container
             - name: PGID
               value: "103050"
@@ -263,34 +129,6 @@ spec:
             value: "0da5KkFMcwib01oNXcTcOSCgXCwIDV80"
           - name: SERVER_COUNTRIES
             value: "United States"
-        - env:                                      # Sonarr container
-            - name: PGID
-              value: "103054"
-            - name: PUID
-              value: "103054"
-            - name: TZ
-              value: Cst/UTC
-            - name: QBT_WEBUI_PORT
-              value: "8080"
-          image: hotio/sonarr
-          name: sonarr
-          ports:
-            - containerPort: 8989
-              protocol: TCP
-          resources:
-            limits:
-              cpu: "2000m"
-              memory: "2048Mi"
-            requests:
-              cpu: "500m"
-              memory: "256Mi"
-          volumeMounts:
-            - name: sonarr-config
-              mountPath: /config
-            - name: media
-              mountPath: /media
-          securityContext:
-            privileged: true
       restartPolicy: Always
       volumes:
         - name: qb-config              # qBittorrent volumes
@@ -298,9 +136,6 @@ spec:
             server: 192.168.1.10
             path: /mnt/servicesTank/qbittorrent
             readOnly: false
-        - name: radarr-config
-          persistentVolumeClaim:
-            claimName: radarr-config
         - name: radarr-media           # Shared media volume
           nfs:
             server: 192.168.1.10
@@ -331,37 +166,3 @@ spec:
             server: 192.168.1.10
             path: /mnt/cpool1/media
             readOnly: false
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: radarr-config
-spec:
-  capacity:
-    storage: 16Gi
-  accessModes:
-    - ReadWriteOnce
-  iscsi:
-     targetPortal: 192.168.1.10:3260
-     iqn: iqn.2005-10.org.freenas.ctl:radarr
-     lun: 0
-     fsType: 'ext4'
-     readOnly: false
-     chapAuthDiscovery: false
-     chapAuthSession: false
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: radarr-config
-  namespace: qbittorrent
-spec:
-  storageClassName: ""
-  volumeName: radarr-config
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 16Gi 
