@@ -47,10 +47,6 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /app/config
-#        - name: music
-#          mountPath: /music
-#        - name: downloads
-#          mountPath: media/downloads
         securityContext:
           allowPrivilegeEscalation: true # not a best practice. linuxserver.io requirement
           readOnlyRootFilesystem: false # not a best practice
@@ -59,17 +55,6 @@ spec:
 #            drop: 
 #            - all
 #          runAsUser: 103060          # linuxserver.io containers require root privilege
-#      volumes:
-#      - name: music
-#        nfs:
-#          server: 192.168.1.10
-#          path: /mnt/cpool1/media/music
-#          readOnly: false
-#      - name: downloads
-#        nfs:
-#          server: 192.168.1.10
-#          path: /mnt/cpool1/media/downloads
-#          readOnly: false
   volumeClaimTemplates:
   - metadata:
       name: data
