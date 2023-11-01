@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: xervato-com
-  namespace: default
+  namespace: ingress-nginx
 spec:
   # Secret names are always required.
   secretName: xervato-com-tls
