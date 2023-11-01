@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: qbittorrent-ingress
+  namespace: media-acq
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - xervato.com
+      secretName: ingress-nginx/xervato-com-tls  # Replace with your Secret name
+  rules:
+    - host: xervato.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: qbittorrent  # Name of the service
+              port:
+                number: 8080  # Port number for the service
