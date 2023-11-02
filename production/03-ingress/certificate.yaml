@@ -18,8 +18,8 @@ spec:
       my-secret-annotation-2: "acme"
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
       reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "media-fe,media-acq"
-      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "media-fe,media-acq"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "media-fe,media-acq,nextcloud"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "media-fe,media-acq,nextcloud"
     labels:
       my-secret-label: xervato-com-tls
 

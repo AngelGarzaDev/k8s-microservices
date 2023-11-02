@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: media-acq
-  namespace: media-acq
+  name: nextcloud
+  namespace: nextcloud
 spec:
   ingressClassName: nginx
   tls:
@@ -17,6 +17,6 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: qbittorrent  # Name of the service
+              name: nextcloud-lb   # Name of the service
               port:
-                number: 8080 # Port number for the service
+                number: 80 # Port number for the service
