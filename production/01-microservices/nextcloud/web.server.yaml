@@ -48,8 +48,8 @@ spec:
         volumeMounts:
         - name: www
           mountPath: /var/www/html
-        - name: data
-          mountPath: /var/www/data
+#        - name: data
+#          mountPath: /var/www/data
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       securityContext:
@@ -63,12 +63,12 @@ spec:
       storageClassName: "freenas-nfs-csi"
       resources:
         requests:
-          storage: 16Gi
-  - metadata:
-      name: data
-    spec:
-      accessModes: [ "ReadWriteOnce"]
-      storageClassName: "freenas-nfs-csi"
-      resources:
-        requests:
           storage: 100Gi
+#  - metadata:
+#      name: data
+#    spec:
+#      accessModes: [ "ReadWriteOnce"]
+#      storageClassName: "freenas-nfs-csi"
+#      resources:
+#        requests:
+#          storage: 100Gi
