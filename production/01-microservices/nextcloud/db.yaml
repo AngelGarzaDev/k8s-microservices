@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nextcloud
+  name: db-hl
+  namespace: default
+spec:
+  selector:
+    app: nextcloud-db
+  clusterIP: None
+  ports:
+  - port: 3306
+    name: web
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: nextcloud-db
+  name: nextcloud-db
+  namespace: default
+spec:
+  serviceName: db-hl
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: nextcloud-db
+  template:
+    metadata:
+      labels:
+        app: nextcloud-db
+    spec:
+      containers:
+      - image: mysql:8.0-debian
+        imagePullPolicy: IfNotPresent
+        name: db-nextcloud
+        ports:
+        - containerPort: 3306
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: changeme
+        - name: MYSQL_DATABASE
+          value: nextcloud
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext:
+        runAsUser: 10454
+      terminationGracePeriodSeconds: 30
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql
+    spec:
+      accessModes: [ "ReadWriteOnce"]
+      storageClassName: "freenas-nfs-csi"
+      resources:
+        requests:
+          storage: 16Gi
