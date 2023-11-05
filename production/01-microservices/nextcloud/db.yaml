@@ -47,6 +47,9 @@ spec:
           value: changeme
         - name: MYSQL_DATABASE
           value: nextcloud
+        volumeMounts:
+        - name: mysql
+          mountPath: /var/lib/mysql
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       securityContext:

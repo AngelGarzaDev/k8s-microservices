@@ -42,6 +42,14 @@ spec:
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+        env:
+        - name: NEXTCLOUD_DATA_DIR
+          value: /var/www/data
+        volumeMounts:
+        - name: www
+          mountPath: /var/www/html
+        - name: data
+          mountPath: /var/www/data
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       securityContext:
@@ -50,6 +58,14 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: www
+    spec:
+      accessModes: [ "ReadWriteOnce"]
+      storageClassName: "freenas-nfs-csi"
+      resources:
+        requests:
+          storage: 16Gi
+  - metadata:
+      name: data
     spec:
       accessModes: [ "ReadWriteOnce"]
       storageClassName: "freenas-nfs-csi"
