@@ -7,7 +7,7 @@ metadata:
   namespace: default
 spec:
   selector:
-    app: nextcloud-db
+    app: mysql-db
   clusterIP: None
   ports:
   - port: 3306
@@ -17,8 +17,8 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    app: nextcloud-db
-  name: nextcloud-db
+    app: mysql-db
+  name: mysql-db
   namespace: default
 spec:
   serviceName: db-hl
@@ -26,11 +26,11 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: nextcloud-db
+      app: mysql-db
   template:
     metadata:
       labels:
-        app: nextcloud-db
+        app: mysql-db
     spec:
       containers:
       - image: mysql:8.0-debian
