@@ -4,7 +4,7 @@ metadata:
   labels:
     app: nextcloud-webserver
   name: nextcloud-webserver
-  namespace: default
+  namespace: nextcloud
 spec:
   internalTrafficPolicy: Cluster
   ipFamilies:
@@ -25,7 +25,7 @@ metadata:
   labels:
     app: nextcloud-db
   name: nextcloud-db
-  namespace: default
+  namespace: nextcloud
 spec:
   internalTrafficPolicy: Cluster
   ipFamilies:

@@ -4,7 +4,7 @@ metadata:
   labels:
     app: nextcloud
   name: db-hl
-  namespace: default
+  namespace: nextcloud
 spec:
   selector:
     app: mysql-db
@@ -19,7 +19,7 @@ metadata:
   labels:
     app: mysql-db
   name: mysql-db
-  namespace: default
+  namespace: nextcloud
 spec:
   serviceName: db-hl
   replicas: 1
@@ -44,7 +44,7 @@ spec:
         terminationMessagePolicy: File
         env:
         - name: MYSQL_ROOT_PASSWORD
-          value: changeme
+          value: 3Uyen09JdPCsXnlSeRDw3s4sfJoaMeyM
         - name: MYSQL_DATABASE
           value: nextcloud
         volumeMounts:
