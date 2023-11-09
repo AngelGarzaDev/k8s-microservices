@@ -79,6 +79,8 @@ spec:
           value: "0da5KkFMcwib01oNXcTcOSCgXCwIDV80"
         - name: SERVER_COUNTRIES
           value: "United States"
+        - name: UPDATER_PERIOD
+          value: 24h
       volumes:
       - name: downloads
         nfs:
