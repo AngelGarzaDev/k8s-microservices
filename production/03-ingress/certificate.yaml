@@ -43,6 +43,8 @@ spec:
   dnsNames:
     - xervato.com
     - www.xervato.com
+    - cloudenjine.com
+    - www.cloudenjine.com
 #  uris:
 #    - spiffe://cluster.local/ns/sandbox/sa/example
 #  ipAddresses:
