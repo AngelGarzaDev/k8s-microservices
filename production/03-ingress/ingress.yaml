@@ -32,3 +32,39 @@ spec:
               name: webserver-hl   # Name of the service
               port:
                 number: 80 # Port number for the service
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cloudenjine-nextcloud
+  namespace: nextcloud
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.org/client-max-body-size: 10G
+    client_body_buffer_size: 1G
+    nginx.ingress.kubernetes.io/proxy-body-size: 10G
+
+    nginx.org/redirect-to-https: "true"
+#    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+#    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+#    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+#    nginx.org/ssl-services: "nextcloud-lb"
+#    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - cloudenjine.com
+      secretName: xervato-com-tls  # Replace with your Secret name
+  rules:
+    - host: cloudenjine.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: webserver-hl   # Name of the service
+              port:
+                number: 80 # Port number for the service
