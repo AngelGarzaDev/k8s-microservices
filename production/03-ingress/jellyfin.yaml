@@ -10,10 +10,8 @@ metadata:
     nginx.org/client-max-body-size: 10G
     client_body_buffer_size: 1G
     nginx.ingress.kubernetes.io/proxy-body-size: 10G
-    nginx.org/redirect-to-https: "false"
 
-#    nginx.ingress.kubernetes.io/app-root: /web/index.html
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.org/redirect-to-https: "true"
 #    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
 #    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 #    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
@@ -23,17 +21,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - xervato.com
-      - jellyfin.xervato.com
+      - cloudenjine.com
       secretName: xervato-com-tls  # Replace with your Secret name
   rules:
-    - host: xervato.com
+    - host: cloudenjine.com
       http:
         paths:
         - path: /
           pathType: Prefix
           backend:
             service:
-              name: jellyfin-hl   # Name of the service
+              name: jellyfin   # Name of the service
               port:
                 number: 8096 # Port number for the service
