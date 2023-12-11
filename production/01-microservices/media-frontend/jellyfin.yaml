@@ -5,8 +5,8 @@ metadata:
   labels:
     app: jellyfin
     use: media-fe
-  name: jellyfin-hl
-  namespace: production
+  name: jellyfin
+  namespace: media-fe
 spec:
   selector:
     app: jellyfin
@@ -17,8 +17,8 @@ kind: Service
 metadata:
   labels:
     app: jellyfin
-  name: jellyfin
-  namespace: production
+  name: jellyfin-lb
+  namespace: media-fe
 spec:
   ports:
   - port: 8096
@@ -27,71 +27,7 @@ spec:
   selector:
     app: jellyfin
   type: LoadBalancer
-  loadBalancerIP: 192.168.3.91
-
----                                            # Persistent Volume - Data
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: jellyfin-data
-spec:
-  storageClassName: ""
-  capacity:
-    storage: 16Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  nfs:
-    path: /mnt/servicesTank/jellyfin
-    server: 192.168.1.10
-    readOnly: false
-
----                                            # Persistent Volume Claim - Data
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: jellyfin-data
-  namespace: production
-spec:
-  storageClassName: ""
-  volumeName: jellyfin-data
-  accessModes: 
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 16Gi
-
----                                            # Persistent Volume - Media
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: jellyfin-media
-spec:
-  storageClassName: ""
-  capacity:
-    storage: 16Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  nfs:
-    path: /mnt/cpool1/media
-    server: 192.168.1.10
-    readOnly: false
-
----                                            # Persistent Volume Claim - Media
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: jellyfin-media
-  namespace: production
-spec:
-  storageClassName: ""
-  volumeName: jellyfin-media
-  accessModes: 
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 16Gi
+#  loadBalancerIP: 192.168.3.91
 
 ---                                             # Stateful Set
 apiVersion: apps/v1
@@ -100,7 +36,7 @@ metadata:
   labels:
     app: jellyfin
   name: jellyfin
-  namespace: production
+  namespace: media-fe
 spec:
   replicas: 1
   selector:
@@ -124,8 +60,8 @@ spec:
             memory: "4G"
             gpu.intel.com/i915: "1"
         env:
-        - name: JELLYFIN_PublishedServerUrl
-          value: 192.168.3.91
+#        - name: JELLYFIN_PublishedServerUrl
+#          value: 192.168.3.91
         - name: JELLYFIN_DATA_DIR
           value: /data
         - name: JELLYFIN_CACHE_DIR
@@ -135,9 +71,9 @@ spec:
         - name: JELLYFIN_LOG_DIR
           value: /data/config/log
         volumeMounts:
-          - name: data-vol
+          - name: data
             mountPath: /data
-          - name: media-volume
+          - name: media
             mountPath: /media
         livenessProbe:
           httpGet:
@@ -164,12 +100,11 @@ spec:
           - 105
           - 226
       volumes:
-      - name: data-vol
-        persistentVolumeClaim:
-          claimName: jellyfin-data
-      - name: media-volume
-        persistentVolumeClaim:
-          claimName: jellyfin-media
+      - name: media
+        nfs:
+          server: 192.168.1.10
+          path: /mnt/cpool1/media
+          readOnly: false
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -180,3 +115,12 @@ spec:
                 operator: In
                 values:
                 - metal
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: freenas-nfs-csi
+      resources:
+        requests:
+          storage: 16Gi
