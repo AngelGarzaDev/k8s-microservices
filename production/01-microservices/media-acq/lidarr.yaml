@@ -32,6 +32,8 @@ spec:
         app: lidarr
         use: media-infra
     spec:
+      securityContext:
+        fsGroup: 3048
       containers:
       - image: linuxserver/lidarr:1.4.5
         name: lidarr
