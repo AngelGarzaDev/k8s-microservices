@@ -11,6 +11,9 @@ spec:
   selector:
     app: jellyfin
   clusterIP: None
+  ports:
+  - port: 8096
+    name: jellyfin
 ---                                             # Load Balancer
 apiVersion: v1
 kind: Service
