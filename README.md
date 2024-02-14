@@ -1,2 +1,3 @@
-# myK3SDeployments
-The K3S deployments running in my Homelab
+# k8s-microservices
+
+Most of the production services in my homelab run in this Kubernetes cluster.
