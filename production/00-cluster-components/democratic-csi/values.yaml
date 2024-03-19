@@ -100,7 +100,7 @@ driver:
 
     nfs:
       shareCommentTemplate: "{{ parameters.[csi.storage.k8s.io/pvc/namespace] }}-{{ parameters.[csi.storage.k8s.io/pvc/name] }}"
-      shareHost: truenas.lan
+      shareHost: truenas.internal
       shareAlldirs: false
       shareAllowedHosts: []
       shareAllowedNetworks: []
