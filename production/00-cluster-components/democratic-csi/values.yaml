@@ -4,8 +4,8 @@ csiDriver:
 
 # add note here about volume expansion requirements
 storageClasses:
-- name: freenas-nfs-csi
-  defaultClass: false
+- name: nfs
+  defaultClass: true
   reclaimPolicy: Delete
   volumeBindingMode: Immediate
   allowVolumeExpansion: true
@@ -50,7 +50,7 @@ driver:
     instance_id:
     httpConnection:
       protocol: http
-      host: 192.168.1.10
+      host: truenas.internal
       port: 80
       # use only 1 of apiKey or username/password
       # if both are present, apiKey is preferred
@@ -82,7 +82,7 @@ driver:
       #  "org.freenas:test": "{{ parameters.foo }}"
       #  "org.freenas:test2": "some value"
 
-      datasetParentName: servicesTank/csi/nfs
+      datasetParentName: servicesTank/csi-prod/nfs
       # do NOT make datasetParentName and detachedSnapshotsDatasetParentName overlap
       # they may be siblings, but neither should be nested in the other
       # do NOT comment this option out even if you don't plan to use snapshots, just leave it with dummy value
@@ -100,7 +100,7 @@ driver:
 
     nfs:
       shareCommentTemplate: "{{ parameters.[csi.storage.k8s.io/pvc/namespace] }}-{{ parameters.[csi.storage.k8s.io/pvc/name] }}"
-      shareHost: 192.168.1.10
+      shareHost: truenas.lan
       shareAlldirs: false
       shareAllowedHosts: []
       shareAllowedNetworks: []
