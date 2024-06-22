@@ -17,7 +17,7 @@ spec:
   tls:
     - hosts:
       - cloudenjine.com
-      - k3s.lan
+      - itdaddy.internal
       secretName: xervato-com-tls  # Replace with your Secret name
   rules:
     - host: cloudenjine.com
@@ -30,7 +30,7 @@ spec:
               name: jellyfin   # Name of the service
               port:
                 number: 8096 # Port number for the service
-    - host: k3s.lan
+    - host: itdaddy.internal
       http:
         paths:
         - path: /jellyfin
