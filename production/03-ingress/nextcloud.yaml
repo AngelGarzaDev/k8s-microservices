@@ -19,13 +19,13 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - xervato.com
-      secretName: xervato-com-tls  # Replace with your Secret name
+      - cloudenjine.com
+      secretName: jellyfin-tls  # Replace with your Secret name
   rules:
-    - host: xervato.com
+    - host: cloudenjine.com
       http:
         paths:
-        - path: /
+        - path: /nextcloud
           pathType: Prefix
           backend:
             service:
