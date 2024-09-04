@@ -41,8 +41,8 @@ spec:
     - client auth
   # At least one of a DNS Name, URI, or IP address is required.
   dnsNames:
-    - jellyfin.xervato.com
-    - www.jellyfin.xervato.com
+    - cloudenjine.com
+    - www.cloudenjine.com
 
 #  uris:
 #    - spiffe://cluster.local/ns/sandbox/sa/example
