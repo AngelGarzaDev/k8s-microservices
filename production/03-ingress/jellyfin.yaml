@@ -18,7 +18,7 @@ spec:
     - hosts:
       - cloudenjine.com
       - itdaddy.internal
-      secretName: xervato-com-tls  # Replace with your Secret name
+      secretName: jellyfin-tls  # Replace with your Secret name
   rules:
     - host: cloudenjine.com
       http:
