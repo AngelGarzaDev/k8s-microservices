@@ -33,7 +33,7 @@ spec:
         use: media-infra
     spec:
       containers:
-      - image: qbittorrentofficial/qbittorrent-nox:4.6.0-1
+      - image: qbittorrentofficial/qbittorrent-nox:latest
         name: qbittorrent
         env:                  # qBittorrent container
           - name: PGID
