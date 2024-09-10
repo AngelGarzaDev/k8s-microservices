@@ -87,6 +87,8 @@ spec:
           value: "on"
         - name: UPDATER_PERIOD
           value: "24h"
+        - name: OPENVPN_ENDPOINT_PORT
+          value: "5060"
       volumes:
       - name: downloads
         nfs:
