@@ -86,7 +86,7 @@ spec:
         - name: PORT_FORWARD_ONLY
           value: "on"
         - name: UPDATER_PERIOD
-          value: 24h
+          value: "24h"
       volumes:
       - name: downloads
         nfs:
