@@ -78,11 +78,13 @@ spec:
         - name: VPN_PORT_FORWARDING_PROVIDER
           value: "protonvpn"
         - name: OPENVPN_USER
-          value: "cXYz2ypNjJIt2pJC+pmp"
+          value: "cXYz2ypNjJIt2pJC+pmp+nr"
         - name: OPENVPN_PASSWORD
           value: "0da5KkFMcwib01oNXcTcOSCgXCwIDV80"
         - name: SERVER_COUNTRIES
           value: "United States"
+        - name: PORT_FORWARD_ONLY
+          value: "on"
         - name: UPDATER_PERIOD
           value: 24h
       volumes:
