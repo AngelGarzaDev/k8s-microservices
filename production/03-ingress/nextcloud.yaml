@@ -20,19 +20,10 @@ spec:
   tls:
     - hosts:
       - cloudenjine.com
+      - itdaddy.io
       secretName: jellyfin-tls  # Replace with your Secret name
   rules:
-    - host: cloudenjine.com
-      http:
-        paths:
-        - path: /nextcloud
-          pathType: Prefix
-          backend:
-            service:
-              name: webserver-hl   # Name of the service
-              port:
-                number: 80 # Port number for the service
-    - host: nextcloud.lan
+    - host: itdaddy.io
       http:
         paths:
         - path: /
