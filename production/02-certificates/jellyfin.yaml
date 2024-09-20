@@ -27,7 +27,7 @@ spec:
   renewBefore: 360h # 15d
   subject:
     organizations:
-      - xervato
+      - itdaddy
   # The use of the common name field has been deprecated since 2000 and is
   # discouraged from being used.
 #  commonName: example.com
@@ -43,6 +43,8 @@ spec:
   dnsNames:
     - cloudenjine.com
     - www.cloudenjine.com
+    - itdaddy.io
+    - www.itdaddy.io
 
 #  uris:
 #    - spiffe://cluster.local/ns/sandbox/sa/example
