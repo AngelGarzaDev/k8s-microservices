@@ -1,0 +1,88 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: flaresolverr
+    use: media-infra
+  name: flaresolverr
+  namespace: media-acq
+spec:
+  selector:
+    app: flaresolverr
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: flaresolverr
+    use: media-infra
+  name: flaresolverr
+  namespace: media-acq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flaresolverr
+  serviceName: flaresolverr
+  template:
+    metadata:
+      labels:
+        app: flaresolverr
+        use: media-infra
+    spec:
+      containers:
+      - image: flaresolverr/flaresolverr:latest
+        name: flaresolverr
+        env:
+          - name: LOG_LEVEL
+            value: "info"
+          - name: CAPTCHA_SOLVER
+            value: ""
+        ports:
+        - containerPort: 8191
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "250M"
+          limits:
+            cpu: "4000m"
+            memory: "4G"
+        volumeMounts:
+        - name: data
+          mountPath: /config
+#        securityContext:
+#          allowPrivilegeEscalation: true # not a best practice. linuxserver.io requirement
+#          readOnlyRootFilesystem: true # not a best practice
+#          runAsNonRoot: true         # not a best practice. linuxserver.io containers require root privilege
+#          capabilities:
+#            drop: 
+#            - all
+#          runAsUser: 103060          # linuxserver.io containers require root privilege
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: freenas-nfs-csi
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: flaresolverr
+    use: media-infra
+  name: flaresolverr-lb
+  namespace: media-acq
+spec:
+  ports:
+  - port: 8191
+    protocol: TCP
+    targetPort: 8191
+  selector:
+    app: flaresolverr
+  type: LoadBalancer
