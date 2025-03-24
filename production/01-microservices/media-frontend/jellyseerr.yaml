@@ -33,7 +33,7 @@ spec:
         use: media-infra
     spec:
       containers:
-      - image: fallenbagel/jellyseerr:1.7.0
+      - image: fallenbagel/jellyseerr:2.5.1
         name: jellyseerr
         ports:
         - containerPort: 5055
