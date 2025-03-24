@@ -52,7 +52,7 @@ spec:
         app: jellyfin
     spec:
       containers:                              # Container
-      - image: jellyfin/jellyfin
+      - image: jellyfin/jellyfin:latest
         name: jellyfin
         resources:
           requests:
