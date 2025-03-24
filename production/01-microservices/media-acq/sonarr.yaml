@@ -33,7 +33,7 @@ spec:
         use: media-infra
     spec:
       containers:
-      - image: linuxserver/sonarr:3.0.10
+      - image: linuxserver/sonarr:latest
         name: sonarr
         ports:
         - containerPort: 8989
