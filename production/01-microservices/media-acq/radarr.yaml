@@ -33,7 +33,7 @@ spec:
         use: media-infra
     spec:
       containers:
-      - image: linuxserver/radarr:5.0.3
+      - image: linuxserver/radarr:latest
         name: radarr
         ports:
         - containerPort: 7878
