@@ -19,9 +19,9 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - cloudenjine.com
+      - itdaddy.internal
       - itdaddy.io
-      secretName: jellyfin-tls  # Replace with your Secret name
+      secretName: xervato-com-tls  # Replace with your Secret name
   rules:
     - host: itdaddy.io
       http:

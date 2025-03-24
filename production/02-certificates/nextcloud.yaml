@@ -18,8 +18,8 @@ spec:
       my-secret-annotation-2: "acme"
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
       reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "media-fe,media-acq,nextcloud,production"
-      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "media-fe,media-acq,nextcloud,production"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "nextcloud"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "nextcloud"
     labels:
       my-secret-label: xervato-com-tls
 
@@ -41,10 +41,8 @@ spec:
     - client auth
   # At least one of a DNS Name, URI, or IP address is required.
   dnsNames:
-    - xervato.com
-    - www.xervato.com
-    - cloudenjine.com
-    - www.cloudenjine.com
+    - itdaddy.io
+    - www.itdaddy.io
 #  uris:
 #    - spiffe://cluster.local/ns/sandbox/sa/example
 #  ipAddresses:
