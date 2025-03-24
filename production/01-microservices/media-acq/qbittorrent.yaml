@@ -72,23 +72,17 @@ spec:
         - name: VPN_SERVICE_PROVIDER
           value: "protonvpn"
         - name: VPN_TYPE
-          value: "openvpn"
+          value: "wireguard"
+        - name: WIREGUARD_PRIVATE_KEY
+          value: "yAJTj1bU4hJSVieG9Zhyl8NnFPmbv/hyYPg0VPG4gEk="
+        - name: WIREGUARD_PUBLIC_KEY
+          value: "houxrsE+RottYWy4pSsRM8ZEReqN0cEzPGtYOzmjOF0="
         - name: VPN_PORT_FORWARDING
           value: "on"
-        - name: VPN_PORT_FORWARDING_PROVIDER
-          value: "protonvpn"
-        - name: OPENVPN_USER
-          value: "cXYz2ypNjJIt2pJC+pmp"
-        - name: OPENVPN_PASSWORD
-          value: "0da5KkFMcwib01oNXcTcOSCgXCwIDV80"
-        - name: SERVER_COUNTRIES
-          value: "United States"
+        - name: SERVER_HOSTNAMES
+          value: "node-us-248.protonvpn.net"
         - name: PORT_FORWARD_ONLY
           value: "on"
-        - name: UPDATER_PERIOD
-          value: "24h"
-        - name: OPENVPN_ENDPOINT_PORT
-          value: "5060"
         - name: DNS_ADDRESS
           value: "9.9.9.9"
       volumes:
