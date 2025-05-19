@@ -37,6 +37,11 @@ spec:
         name: radarr
         ports:
         - containerPort: 7878
+        env:
+          - name: PGID
+            value: "3048"
+          - name: PUID
+            value: "3048"
         resources:
           requests:
             cpu: "250m"
