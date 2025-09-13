@@ -17,7 +17,7 @@ spec:
         app: navidrome
     spec:
       containers:
-      - image: deluan/navidrome:develop
+      - image: deluan/navidrome:latest
         name: navidrome
         resources:
           requests:
