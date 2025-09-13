@@ -18,3 +18,6 @@ kubectl exec --stdin --tty deluge-5576cb5457-qz7h6 -- /bin/bash
 # Resolve Alpine or Busybox crash loop
     # A command needs to be run to keep the process open.
     kubectl run alpine --image=alpine:latest -n production --command -- sleep 1800
+
+# Change default Namespace
+    kubectl config set-context --current --namespace=media-acq
