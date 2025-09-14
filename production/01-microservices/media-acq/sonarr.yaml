@@ -37,6 +37,11 @@ spec:
         name: sonarr
         ports:
         - containerPort: 8989
+        env:
+          - name: PGID
+            value: "3048"
+          - name: PUID
+            value: "3048"
         resources:
           requests:
             cpu: "250m"
